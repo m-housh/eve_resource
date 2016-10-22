@@ -9,13 +9,13 @@ EveResource
 .. image:: https://img.shields.io/travis/m-housh/eve_resource.svg
         :target: https://travis-ci.org/m-housh/eve_resource
 
+.. image:: https://coveralls.io/repos/github/m-housh/eve_resource/badge.svg?branch=master
+        :target: https://coveralls.io/github/m-housh/eve_resource?branch=master
+
+         
 .. image:: https://readthedocs.org/projects/eve-resource/badge/?version=latest
         :target: https://eve-resource.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
-
-.. image:: https://pyup.io/repos/github/m-housh/eve_resource/shield.svg
-     :target: https://pyup.io/repos/github/m-housh/eve_resource/
-     :alt: Updates
 
 
 Resource utilities for Eve
