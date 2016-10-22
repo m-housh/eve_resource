@@ -1,0 +1,10 @@
+# Development Dockerfile for eve_resource
+#
+# This file is used for development commands, and 
+# interactive shell's with your package.
+FROM mhoush/py-dev:latest
+
+ENV PROJECT eve_resource
+ENV PROJECT_PYTHON 3.5.0
+
+RUN /bin/bash /entrypoint.sh install
