@@ -54,41 +54,33 @@ class TestEve_resource(object):
         assert accounts.key.password == 'password'
         assert len(accounts.key) == 2
 
-    def test_set_definition(self, accounts, definition):
-        assert accounts.definition() is None
-        accounts.set_definition(definition)
-        assert accounts.definition() == definition
-
-        with pytest.raises(TypeError):
-            accounts.set_definition(None)
-
     def test_definition(self, accounts, definition):
-        assert accounts.definition() is None
+        assert accounts.definition_value == {}
 
         @accounts.definition
         def wrapped_def():
             return definition
 
-        assert accounts.definition() == definition
-
-    def test_set_schema(self, accounts, schema):
-        assert accounts.schema() is None
-        accounts.set_schema(schema)
-        assert accounts.schema() == schema
-
+        assert accounts.definition_value == definition
+        del(accounts.definition_value)
         with pytest.raises(TypeError):
-            accounts.set_schema([])
+            accounts.definition_value = 'not a dict'
 
     def test_schema(self, accounts, schema):
-        assert accounts.schema() is None
+        assert accounts.schema_value == {}
 
         @accounts.schema
         def wrapped_schema():
+            """Wrapped schema doc"""
             return schema
 
-        assert accounts.schema() == schema
+        assert accounts.schema_value == schema
+        assert wrapped_schema.__doc__ == """Wrapped schema doc"""
 
-        accounts._schema = None
+        del(accounts.schema_value)
+
+        with pytest.raises(TypeError):
+            accounts.schema_value = 'not a dict'
 
         @accounts.schema
         def schema2(key):
@@ -103,14 +95,14 @@ class TestEve_resource(object):
                 },
             }
 
-        assert accounts.schema() == schema
+        assert accounts.schema_value == schema
 
     def test_domain(self, accounts, definition, schema):
 
-        accounts.set_schema(schema)
+        accounts.schema_value = schema
         assert accounts.domain() == {'schema': schema}
 
-        accounts.set_definition(definition)
+        accounts.definition_value = definition
 
         value = definition.copy()
         value['schema'] = schema

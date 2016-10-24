@@ -4,6 +4,14 @@ eve_resource package
 Submodules
 ----------
 
+eve_resource.events module
+--------------------------
+
+.. automodule:: eve_resource.events
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 eve_resource.exceptions module
 ------------------------------
 
