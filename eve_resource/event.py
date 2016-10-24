@@ -21,7 +21,8 @@ class Event(object):
     instance and if it does we call the :attr:`func` for this instance.
 
     :param event:  A string of the :class:`eve.Eve` event to register the
-                function for.  This can also be a valid value in :attr:`aliases`
+                function for.  This can also be a valid value in
+                :attr:`aliases`
     :param resource:  The :class:`eve.Eve` domain resource the function is for.
     :param func:  A callable that's called as the event hook.
     :param aliases:  A :class:`dict` with keys being strings of valid
