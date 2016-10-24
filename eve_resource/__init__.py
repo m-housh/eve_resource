@@ -2,7 +2,7 @@
 
 from .exceptions import NotCallable, EveResourceError
 from .hooks import EventHooks, mongo_hooks, request_hooks, Hooks
-from .events import Event, mongo_event, request_event
+from .event import Event, mongo_event, request_event
 from .resource import Resource
 from .utils import callable_or_error, request_aliases, mongo_aliases
 

@@ -2,7 +2,6 @@
 
 from typing import Optional, Callable, Any, Dict, NamedTuple
 from collections import namedtuple
-from functools import wraps
 
 from eve import Eve
 
@@ -62,8 +61,6 @@ class Resource(object):
         if self._hooks is None:
             self._hooks = hooks.Hooks(self.name)
         return self._hooks
-
-
 
     def keys(self, *keys) -> None:
         """Creates a namedtuple of the keys.

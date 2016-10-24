@@ -4,7 +4,7 @@ from typing import Any, Optional, Iterable
 
 from eve import Eve
 
-from .events import Event, request_event, mongo_event, EventFuncType
+from .event import Event, request_event, mongo_event, EventFuncType
 
 # from .exceptions import NotCallable
 # from .utils import callable_or_error # , mongo_aliases, request_aliases
