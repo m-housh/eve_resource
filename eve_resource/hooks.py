@@ -1,152 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, Any, Callable, Optional, Iterable
+from typing import Any, Optional, Iterable
 
 from eve import Eve
 
-from .exceptions import NotCallable
-from .utils import callable_or_error
+from .events import Event, request_event, mongo_event, EventFuncType
 
-AliasType = Dict[str, str]
-EventFuncType = Callable[..., Any]
-
-
-def _mongo_aliases() -> AliasType:
-    """Creates aliases for mongo events."""
-    keys = ('fetch', 'insert', 'update', 'replace', 'delete')
-
-    rv = {}  # type: AliasType
-    for key in keys:
-        rv[key] = 'on_' + key
-        if key.endswith('e'):
-            key = key + 'd'
-        else:
-            key = key + 'ed'
-
-        rv[key] = 'on_' + key
-
-    return rv
-
-
-def _request_aliases() -> AliasType:
-    """Creates aliases for request events"""
-    keys = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
-
-    rv = {}  # type: AliasType
-    for key in keys:
-        rv['pre_' + key] = 'on_pre_' + key
-        rv['post_' + key] = 'on_post_' + key
-
-    return rv
-
-
-class Event(object):
-    """Holds a function to register with an :class:`eve.Eve` instance as an
-    event hook.
-
-    :param event:  The :class:`eve.Eve` event to register the function for.
-    :param resource:  The :class:`eve.Eve` domain resource the function is for.
-    :param func:  A callable that's called as the event hook.
-
-    """
-
-    # aliases = None  # type: AliasType
-
-    def __init__(self, event: str, resource: str,
-                 func: Optional[EventFuncType]=None,
-                 aliases: Optional[AliasType]=None) -> None:
-
-        self.aliases = aliases
-        self.event = self.parse_event(event)
-        self.resource = resource
-        self.func = callable_or_error(func) if func is not None else None
-
-    def parse_event(self, event: str) -> str:
-        """Parses an event, returning a valid event that can be registered
-        with an ``Eve`` instance.
-
-        :param event: A string to check if it's valid.  If no aliases are set
-                      for a class, then this will just return the input event.
-
-        :raises ValueError:  If :attr:`aliases` is not ``None`` and the event
-                             is not a valid alias.
-
-        """
-        if self.aliases is not None:
-            if event in self.aliases.keys():
-                return self.aliases[event]
-            elif event in self.aliases.values():
-                return event
-            else:
-                # make this a better error
-                raise ValueError(event)
-        return event
-
-    def set_func(self, func: EventFuncType) -> None:
-        """Set's the func for an instance, can be used as a decorator.
-
-        :param func:  The func to set on the instance.
-
-        """
-        self.func = callable_or_error(func)
-
-    def register(self, app: Eve) -> None:
-        """Register's an instance with an :class:`eve.Eve` instance.
-
-        :param app:  The :class:`eve.Eve` instance to register the event with.
-
-        """
-        if not isinstance(app, Eve):
-            raise TypeError(app)
-
-        attr = getattr(app, self.event, None)
-
-        if attr is not None:
-            attr += self
-        # else raise Error
-
-    def __call__(self, resource, *args, **kwargs) -> Any:
-        """Call the :attr:`func` if the resource matches.
-
-        """
-        if resource == self.resource:
-            try:
-                return callable_or_error(self.func)(*args, **kwargs)
-            except NotCallable:
-                pass
-
-    def __repr__(self) -> str:
-        return (
-            "{n}('{e}', '{r}', func={f}, aliases={a})".format(
-                n=self.__class__.__name__,
-                e=self.event,
-                r=self.resource,
-                f=self.func,
-                a=self.aliases
-            )
-        )
-
-
-def mongo_event(event: str, resource: str, func: Optional[EventFuncType]=None
-                ) -> Event:
-    """A function to return an :class:`Event` with aliases set-up for mongo
-    events.
-
-    """
-    return Event(event, resource, func, _mongo_aliases())
-
-
-def request_event(event: str, resource: str, func: Optional[EventFuncType]=None
-                  ) -> Event:
-    """A function to return an :class:`Event` with aliases set-up for request
-    events.
-
-    """
-    return Event(event, resource, func, _request_aliases())
+# from .exceptions import NotCallable
+# from .utils import callable_or_error # , mongo_aliases, request_aliases
 
 
 class EventHooks(object):
+    """An :class:`Event` container that holds events for a domain resource.
 
+    :param resource:  The domain resource
+    :param EventType:  The :class:`Event` class or function for the events of
+                    this class.
+
+    """
     def __init__(self, resource: str, EventType=Event) -> None:
         self.EventType = EventType
         self.resource = resource
@@ -169,8 +40,9 @@ class EventHooks(object):
 
         """
 
-        def inner(func: EventFuncType) -> None:
-            return self._make_and_append(event, func)
+        def inner(func: EventFuncType) -> EventFuncType:
+            self._make_and_append(event, func)
+            return func
 
         if isinstance(event, str):
             return inner if func is None else inner(func)
@@ -194,13 +66,21 @@ class EventHooks(object):
         :param func:  The function to use for the api hook event.
 
         """
-        def inner(func: EventFuncType) -> None:
+        def inner(func: EventFuncType) -> EventFuncType:
             for event in events:
                 self.event(event, func)
+            return func
 
         return inner(func) if func is not None else inner
 
     def init_api(self, api: Eve) -> None:
+        """Register all event's with an :class:`eve.Eve` instance.
+
+        :param api:  An :class:`eve.Eve` instance
+
+        :raises TypeError:  If api is not an :class:`eve.Eve` instance
+
+        """
         if not isinstance(api, Eve):
             raise TypeError(api)
 
@@ -259,8 +139,28 @@ class Hooks(object):
 
     def __init__(self, resource: str) -> None:
         self.resource = resource
-        self.mongo = mongo_hooks(self.resource)
-        self.requests = request_hooks(self.resource)
+        self._mongo = None
+        self._requests = None
+
+    @property
+    def mongo(self) -> EventHooks:
+        """A :class:`EventHooks` setup for mongo type events that can
+        be registered with an :class:`eve.Eve` api.
+
+        """
+        if self._mongo is None:
+            self._mongo = mongo_hooks(self.resource)
+        return self._mongo
+
+    @property
+    def requests(self) -> EventHooks:
+        """A :class:`EventHooks` setup for request type events that can
+        be registered with an :class:`eve.Eve` api.
+
+        """
+        if self._requests is None:
+            self._requests = request_hooks(self.resource)
+        return self._requests
 
     def init_api(self, api: Eve) -> None:
         """Register's the hooks with an :class:`eve.Eve` instance.
