@@ -99,11 +99,11 @@ def test_Hooks(test_func):
     _hooks = hooks.Hooks('resource')
     assert isinstance(_hooks.mongo, hooks.EventHooks)
     assert len(_hooks.mongo.events) == 0
-    assert isinstance(_hooks.requests, hooks.EventHooks)
-    assert len(_hooks.requests.events) == 0
+    assert isinstance(_hooks.request, hooks.EventHooks)
+    assert len(_hooks.request.events) == 0
 
     _hooks.mongo.event('insert', test_func)
-    _hooks.requests.event('post_PATCH', test_func)
+    _hooks.request.event('post_PATCH', test_func)
 
     api = Eve(settings={'DOMAIN': {}})
     assert len(api.on_insert) == 0

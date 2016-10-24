@@ -120,7 +120,7 @@ class TestEve_resource(object):
         accounts.init_api(app)
         assert len(app.on_insert) == 1
 
-        @accounts.hooks.requests('pre_GET', 'post_POST')
+        @accounts.hooks.request('pre_GET', 'post_POST')
         def tes2(*args, **kwargs):
             pass
 

@@ -140,7 +140,7 @@ class Hooks(object):
     def __init__(self, resource: str) -> None:
         self.resource = resource
         self._mongo = None
-        self._requests = None
+        self._request = None
 
     @property
     def mongo(self) -> EventHooks:
@@ -153,14 +153,14 @@ class Hooks(object):
         return self._mongo
 
     @property
-    def requests(self) -> EventHooks:
+    def request(self) -> EventHooks:
         """A :class:`EventHooks` setup for request type events that can
         be registered with an :class:`eve.Eve` api.
 
         """
-        if self._requests is None:
-            self._requests = request_hooks(self.resource)
-        return self._requests
+        if self._request is None:
+            self._request = request_hooks(self.resource)
+        return self._request
 
     def init_api(self, api: Eve) -> None:
         """Register's the hooks with an :class:`eve.Eve` instance.
@@ -175,4 +175,4 @@ class Hooks(object):
             raise TypeError(api)
 
         self.mongo.init_api(api)
-        self.requests.init_api(api)
+        self.request.init_api(api)
