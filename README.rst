@@ -11,7 +11,6 @@ EveResource
 
 .. image:: https://coveralls.io/repos/github/m-housh/eve_resource/badge.svg?branch=master
         :target: https://coveralls.io/github/m-housh/eve_resource?branch=master
-
          
 .. image:: https://readthedocs.org/projects/eve-resource/badge/?version=latest
         :target: https://eve-resource.readthedocs.io/en/latest/?badge=latest
