@@ -19,15 +19,16 @@ class Resource(object):
     registering event hooks with the :class:`eve.Eve` api.
 
     :param name:  The resource name to be registered with the api.
-    :param keys:  Strings used as a key for the fields of the resource schema.
+    :param keys:  Iterable of strings used as a key for the fields of the
+                resource schema.
 
     Example::
 
-        persons = Resource('persons', 'first_name', 'last_name')
+        persons = Resource('persons', keys=('first_name', 'last_name'))
 
     """
 
-    def __init__(self, name, *keys):
+    def __init__(self, name, keys=[]):
         self.name = name
         self._key = None  # type: NamedTuple
         self._definition = None  # type: Dict[str, Any]

@@ -9,7 +9,7 @@ from .utils import callable_or_error, request_aliases, mongo_aliases
 
 __author__ = 'Michael Housh'
 __email__ = 'mhoush@houshhomeenergy.com'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 __all__ = [
     # exceptions

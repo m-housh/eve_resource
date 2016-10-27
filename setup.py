@@ -26,7 +26,7 @@ setup_requirements = [
 
 setup(
     name='eve_resource',
-    version='0.1.4',
+    version='0.1.5',
     description="Resource utilities for Eve",
     long_description=readme + '\n\n' + history,
     author="Michael Housh",
