@@ -16,7 +16,7 @@ from eve_resource import resource
 
 @pytest.fixture()
 def accounts():
-    return resource.Resource('accounts', 'username', 'password')
+    return resource.Resource('accounts', keys=('username', 'password'))
 
 
 @pytest.fixture()
