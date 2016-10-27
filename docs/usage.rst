@@ -18,8 +18,7 @@ persons.py::
     
     persons = eve_resource.Resource(
         'persons',  # resource name, to register with the app.
-
-        'first_name', 'last_name'  # keys for resource fields.
+        keys=('first_name', 'last_name')  # keys for resource fields.
     )
 
     @persons.schema
